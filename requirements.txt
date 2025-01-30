@@ -1,6 +1,6 @@
-streamlit==1.31.1
-transformers==4.37.2
-torchaudio==2.1.2
-torch==2.1.2
-librosa==0.10.1
-pydub==0.25.1
+streamlit
+transformers
+torchaudio
+torch
+librosa
+pydub
