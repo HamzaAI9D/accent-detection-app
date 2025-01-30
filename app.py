@@ -4,7 +4,6 @@ from transformers import pipeline
 import soundfile as sf
 import tempfile
 import torch
-import wave
 
 # Hugging Face Token
 HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
@@ -12,13 +11,14 @@ HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Load the pipeline
+@st.cache_resource
 def load_pipeline():
     return pipeline("audio-classification", model="HamzaSidhu786/speech-accent-detection", device=device, token=HF_TOKEN)
 
 pipe = load_pipeline()
 
 st.title("Speech Accent Detection 🎤")
-st.write("Welcome! Record your voice and check your accent.")
+st.write("Welcome! Read the script, record your voice, and check your accent.")
 
 scripts = [
     "Please call Stella.",
@@ -28,24 +28,20 @@ scripts = [
 selected_script = st.selectbox("Select a script:", scripts)
 st.info(selected_script)
 
-# File uploader instead of recording
-st.write("### Upload your voice recording (.wav)")
-audio_data = st.file_uploader("Upload your audio file", type=["wav"])
+# Record audio input
+st.write("### Record Your Voice:")
+audio_data = st.audio_input("Press to record and check your accent.")
 
 if audio_data is not None:
+    # Save the recorded audio to a temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
-        temp_audio.write(audio_data.read())
+        temp_audio.write(audio_data.getvalue())
         temp_audio_path = temp_audio.name
 
-    # Read WAV file properties
-    with wave.open(temp_audio_path, "rb") as wav_file:
-        sample_rate = wav_file.getframerate()
-        num_channels = wav_file.getnchannels()
-    
     # Load the audio using soundfile
     audio_waveform, sample_rate = sf.read(temp_audio_path)
 
-    # Play the uploaded audio
+    # Play the recorded audio
     st.audio(temp_audio_path, format="audio/wav")
 
     # Predict the accent
