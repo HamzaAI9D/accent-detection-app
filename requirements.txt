@@ -4,3 +4,4 @@ torchaudio
 torch
 librosa
 pydub
+ffmpeg-python
